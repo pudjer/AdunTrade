@@ -7,7 +7,7 @@ const ObjectsMap = new Map<string, object>()
 let uuidStart = '##UUID##'
 const propNamesEnd = '##PROPS##'
 const simpleValueStart = '##SIMPLE##'
-
+//
 let REHIDRATION = false
 const sessionsStart = '##SESSIONS##'
 
