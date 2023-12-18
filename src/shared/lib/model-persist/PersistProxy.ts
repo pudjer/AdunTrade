@@ -9,10 +9,6 @@ const propNamesEnd = '##PROPS##'
 const simpleValueStart = '##SIMPLE##'
 
 let CONSTRUCTION = false
-const sessionsStart = '##SESSIONS##'
-
-const SessionsString = localStorage.getItem(sessionsStart)
-const Sessions = SessionsString ? JSON.parse(SessionsString) : [(new Date()).toISOString()]
 
 
 const simpleValueMap = new Map<string, any>()
@@ -47,10 +43,7 @@ const rehidrate = (uuid: string, isRoot?: true) => {
   return  res
 }
 export const rehidrateRoot = <T>(className: string): T => {
-  let res
-  CONSTRUCTION=true
-  res = rehidrate(uuidStart+className, true)
-  return res
+  return rehidrate(uuidStart+className, true)
 }
 
 export const makePersistend = (className: string, isRoot?: true): (<T extends new (...args: [])=>any>(cl: T) => T) => (target) => {
