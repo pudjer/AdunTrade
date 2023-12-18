@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 4000",
-    "build:prod": "webpack  --env mode=production",
+    "build:prod": "vite build",
     "build:dev": "webpack  --env mode=development"
   },
   "dependencies": {

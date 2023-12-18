@@ -1,4 +1,9 @@
 .content {
+  margin: 20px;
   height: 100vh;
   overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: normal;
+  flex-wrap: wrap;
 }

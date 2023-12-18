@@ -1,7 +1,7 @@
-import { ITab } from "../model/Tab";
+import { Tab } from "../model/Tab";
 
 
-export const pushTab = (tabs: ITab[], keySet: string[], ...items: ITab[]) => {
+export const pushTab = (tabs: Tab[], keySet: string[], ...items: Tab[]) => {
   for (const item of items) {
     if (keySet.findIndex(e => item.key === e) === -1) {
       tabs.push(item)
@@ -9,7 +9,7 @@ export const pushTab = (tabs: ITab[], keySet: string[], ...items: ITab[]) => {
     }
   }
 }
-export const deleteTab = (tab: ITab | number | string, tabs: ITab[], selectedTab: string, keySet: string[]): string => {
+export const deleteTab = (tab: Tab | number | string, tabs: Tab[], selectedTab: string, keySet: string[]): string => {
   if (typeof tab === 'object') {
     tab = tabs.indexOf(tab)
   } else if (typeof tab === 'string') {
@@ -25,9 +25,10 @@ export const deleteTab = (tab: ITab | number | string, tabs: ITab[], selectedTab
 }
 
 
-export function replaceTab(tab1: ITab | number, tab2: ITab | number, tabs: ITab[]) {
+export function replaceTab(tab1: Tab | number, tab2: Tab | number, tabs: Tab[]) {
   const firstInd = typeof tab1 === 'object' ? tabs.indexOf(tab1) : tab1
   const secondInd = typeof tab2 === 'object' ? tabs.indexOf(tab2) : tab2
+  if (firstInd < 0 || secondInd > tabs.length - 1) return
   const first = tabs[firstInd]
   tabs.splice(firstInd, 1)
   tabs[secondInd] = first

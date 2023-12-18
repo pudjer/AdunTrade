@@ -1,7 +1,7 @@
 import {  ReactNode, useEffect, useRef, useState } from "react";
 import { autorun } from "./autorun";
 
-export const ReactObservable = <T extends React.FC<any>>(Component: T): T => {
+export const ReactObserver = <T extends React.FC<any>>(Component: T): T => {
 
   const Wrapper: React.FC= (props, context) => {
     const [_, toggleState] = useState<symbol>(Symbol())

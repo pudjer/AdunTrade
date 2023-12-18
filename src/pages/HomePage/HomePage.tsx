@@ -1,4 +1,4 @@
-import { ReactObservable } from "@/shared/lib/model-persist/ReactObservable";
+import { ReactObserver } from "@/shared/lib/model-persist/ReactObservable";
 import {makePersistend, rehidrateRoot } from "@/shared/lib/model-persist/PersistProxy";
 import { makeObservable } from "@/shared/lib/model-persist/obvservable";
 import { useRef } from "react";
@@ -46,7 +46,7 @@ try{
   rofl = new Rofl()
 } 
 
-export const HomePage: React.FC = ReactObservable(() => {
+export const HomePage: React.FC = ReactObserver(() => {
   const ref = useRef(rofl.a)
   return(
     <>
@@ -73,7 +73,7 @@ export const HomePage: React.FC = ReactObservable(() => {
     </>
   )
 })
-const AnotherChild = ReactObservable<React.FC<{a: NeRofl}>>(({a}) =>{
+const AnotherChild = ReactObserver<React.FC<{a: NeRofl}>>(({a}) =>{
   return(
     <>
     {a.b ? 'child true' : 'child false'}
@@ -88,7 +88,7 @@ const AnotherChild = ReactObservable<React.FC<{a: NeRofl}>>(({a}) =>{
     </>
   )
 })
-const Child = ReactObservable<React.FC<{a: myArray}>>(({a}) =>{
+const Child = ReactObserver<React.FC<{a: myArray}>>(({a}) =>{
   return(
     <>
     {a.map((e, i)=> <div key={i}>{e}</div>)}

@@ -1,3 +1,3 @@
 export type RefreshResponse = {
-  access_token: string
+  token: string
 }

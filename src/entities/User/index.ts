@@ -1,0 +1,1 @@
+export {User, UserService, UserFactory} from './model/User'

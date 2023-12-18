@@ -1,35 +1,38 @@
-import React, { memo } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input } from 'antd';
-import { LoginRequest, LoginResponse } from '@/entities/User/api/types/Login';
-import { useQuery } from '@/shared/lib/useQuery/useQuery';
-import { Store } from '@/app/providers/Store';
-import { MeResponse } from '@/entities/User/api/types/Me';
-interface LoginProps{
-  getMe: ()=>Promise<MeResponse>
-  login: (json: LoginRequest) => Promise<LoginResponse>
-  store: Store
-}
-
+import { Button, Form, Input, Typography } from 'antd';
+import { ReactObserver } from '@/shared/lib/model-persist/ReactObservable';
+import { UserService } from '@/entities/User/model/User';
+import { useState } from 'react';
+const {Text} = Typography
 interface FormValue{
   username: string
   password: string
 }
-export const Login: React.FC<LoginProps> = memo(({login, store, getMe}) => {
-  const {toggleQuery, isPending} = useQuery(login)
-  const {toggleQuery: tQ, isPending: iP} = useQuery(getMe)
-  const onFinish = async(values: FormValue) => {
-    if(toggleQuery && tQ){
-      const loginRes = await toggleQuery(values)
-      const user = await tQ()
+interface FormValue{
+  username: string
+  password: string
+}
+export const Login: React.FC<{userService: UserService}> = ReactObserver(({userService}) => {
+  const [formError, setFormError] = useState<Error | undefined>(undefined)
+
+  const onFinish = async(values: FormValue & {confirmPassword: string}) => {
+    setFormError(undefined)
+    try{
+      userService.Login(values.username, values.password)
+    }catch(e){
+      if(e instanceof Error){
+        setFormError(e)
+      }
     }
   };
-
+ 
+ 
   return (
     <Form
       name="normal_login"
       onFinish={onFinish}
     >
+      {formError && <Text type='danger'>{formError.message}</Text>}
       <Form.Item
         name="username"
         rules={[{ required: true, message: 'Please input your Username!' }]}

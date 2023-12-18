@@ -6,12 +6,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
 node_modules
 dist
 dist-ssr
 *.local
-
+app
 # Editor directories and files
 .idea
 .DS_Store

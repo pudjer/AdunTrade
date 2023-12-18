@@ -8,7 +8,7 @@ let uuidStart = '##UUID##'
 const propNamesEnd = '##PROPS##'
 const simpleValueStart = '##SIMPLE##'
 
-let REHIDRATION = false
+let CONSTRUCTION = false
 const sessionsStart = '##SESSIONS##'
 
 const SessionsString = localStorage.getItem(sessionsStart)
@@ -48,14 +48,8 @@ const rehidrate = (uuid: string, isRoot?: true) => {
 }
 export const rehidrateRoot = <T>(className: string): T => {
   let res
-  REHIDRATION=true
-  try{
-    res = rehidrate(uuidStart+className, true)
-  }catch(e){
-    throw e
-  }finally{
-    REHIDRATION=false
-  }
+  CONSTRUCTION=true
+  res = rehidrate(uuidStart+className, true)
   return res
 }
 
@@ -67,7 +61,13 @@ export const makePersistend = (className: string, isRoot?: true): (<T extends ne
       const constructedProps = Object.getOwnPropertyDescriptors(instance)
       const res =  PersistProxy(instance, className, isRoot ? {} : undefined, isRoot ? uuidStart + className : undefined)
       for(const i in constructedProps){
-        Reflect.defineProperty(res, i, constructedProps[i])
+        const pre = CONSTRUCTION
+        CONSTRUCTION=true
+        try{
+          Reflect.defineProperty(res, i, constructedProps[i])
+        }catch(e){}finally{
+          CONSTRUCTION=pre
+        }
       }
       return res
     }
@@ -119,7 +119,7 @@ const PersistProxy =  <T extends { [key: string | symbol]: any}>(instance: T, cl
       const newV = a.value
       let res
       if(parentSet.size>0){
-        if(oldV!==newV || REHIDRATION){
+        if(oldV!==newV || CONSTRUCTION){
           removeProp(t, p)
           res = Reflect.defineProperty(t, p, a)
           defineProp(t, p)
@@ -150,8 +150,6 @@ const isSerializableValue = (value: any): value is string => {
     case 'number':
       return true
     case 'string':
-      return true
-    case 'undefined':
       return true
     default:
       return false

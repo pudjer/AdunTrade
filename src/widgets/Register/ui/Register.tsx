@@ -1,36 +1,29 @@
 import React, { memo, useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input } from 'antd';
-import { useQuery } from '@/shared/lib/useQuery/useQuery';
-import { Store } from '@/app/providers/Store';
-import { MeResponse } from '@/entities/User/api/types/Me';
-import { UserFactory } from '@/entities/User/lib/UserFactory';
-import { RegisterRequest, RegisterResponse } from '@/entities/User/api/types/Register';
-interface RegisterProps{
-  getMe: ()=>Promise<MeResponse>
-  register: (json: RegisterRequest) => Promise<RegisterResponse>
-  store: Store
-}
-
+import { Button, Form, Input, Typography } from 'antd';
+import { UserService } from '@/entities/User/model/User';
+const {Text} = Typography
 interface FormValue{
   username: string
   password: string
 }
-export const Register: React.FC<RegisterProps> = memo(({register, store, getMe}) => {
+export const Register: React.FC<{userService: UserService}> = memo(({userService}) => {
   const [confirm, setConfirm] = useState<string>('')
   const [password, setPassword] = useState<string>('')
-  const [formError, setFormError] = useState<string>('')
-  const {toggleQuery} = useQuery(register)
-  const {toggleQuery: tQ} = useQuery(getMe)
+  const [formError, setFormError] = useState<Error | undefined>(undefined)
+
   const onFinish = async(values: FormValue & {confirmPassword: string}) => {
+    setFormError(undefined)
     if(password!==confirm){
-      setFormError('passwords not same')
+      setFormError(new Error('passwords not same'))
       return
     }
-    if(toggleQuery && tQ){
-      const loginRes = await toggleQuery(values)
-      const user = await tQ()
-      store.user = UserFactory(user)
+    try{
+      userService.Register(values.username, values.password)
+    }catch(e){
+      if(e instanceof Error){
+        setFormError(e)
+      }
     }
   };
   return (
@@ -56,7 +49,7 @@ export const Register: React.FC<RegisterProps> = memo(({register, store, getMe})
       >
         <Input.Password onChange={e=>setConfirm(e.target.value)} value={confirm} prefix={<LockOutlined/>} placeholder="confirm password" />
       </Form.Item>
-      <div>{formError}</div>
+      {formError && <Text type='danger'>{formError.message}</Text>}
       <Form.Item>
         <Button type="primary" htmlType="submit">
           Register
