@@ -1,35 +1,22 @@
-import { ReactObserver } from "@/shared/lib/model-persist/ReactObservable";
+import { ReactObserver } from "@/shared/lib/observavle/ReactObservable";
 import { FC, useState } from "react";
 import Title from "antd/es/typography/Title";
 import { UserService } from "@/entities/User/model/User";
 import { Button, Typography } from "antd";
+import { useQuery } from "@/shared/lib/useQuery/useQuery";
 const { Text } = Typography;
 
 export const Profile: FC<{userService: UserService}> = ReactObserver(({userService})=>{
-  const [error, setError] = useState<Error>()
+  
+  const {toggleQuery: onSubscribe, error: suberror} = useQuery(()=>userService.Subscribe())
+  const {toggleQuery: onUnsubscribe, error: unsuberror} = useQuery(()=>userService.Unsubscribe())
   const user = userService.user!
-  console.log('rerender')
-  const onSubscribe = () => {
-    try{
-      userService.Subscribe()
-    }catch(e){
-      if(e instanceof Error){
-        setError(e)
-      }
-    }
-  } 
-  const onUnsubscribe = () => {
-    try{
-      userService.Unsubscribe()
-    }catch(e){
-      if(e instanceof Error){
-        setError(e)
-      }
-    }
-  } 
+  
   return(
     <div>
-      {error && <Text type="warning">{error.message}</Text>}
+      {suberror && <Text type="warning">{suberror.message}</Text>}
+      {unsuberror && <Text type="warning">{unsuberror.message}</Text>}
+
       <Title>Username: {user.username}</Title>
       {
         user.isSubscribed

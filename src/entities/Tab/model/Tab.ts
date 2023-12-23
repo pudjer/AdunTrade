@@ -1,7 +1,7 @@
 import { Item } from "@/entities/Item/model/Item"
 import { MyArray } from "@/entities/Store/Classes"
 import { makePersistend } from "@/shared/lib/model-persist/PersistProxy"
-import { makeObservable } from "@/shared/lib/model-persist/obvservable"
+import { makeObservable } from "@/shared/lib/observavle/obvservable"
 import { deleteTab, pushTab, replaceTab } from "../lib/Helpers"
 
 
@@ -10,13 +10,14 @@ import { deleteTab, pushTab, replaceTab } from "../lib/Helpers"
 export class Tab {
   label!: string
   key!: string
-  items: Item[] = []
+  items = new MyArray<Item>()
 }
 
 export const TabFactory = (label: string, key: string) => {
   const res = new Tab()
   res.key = key
-  res.label = label
+  res.label = label 
+  return res
 }
 
 

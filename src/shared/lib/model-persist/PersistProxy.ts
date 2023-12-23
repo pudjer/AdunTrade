@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import 'reflect-metadata'
 const uuidSymbol = Symbol()
 const deleteParentSymbol = Symbol()
 const addParentSymbol = Symbol()
@@ -69,8 +70,18 @@ export const makePersistend = (className: string, isRoot?: true): (<T extends ne
 
 
 
+const notPersistedPropertyMap = new Map<any, Set<string | symbol>>()
 
-
+export const notPersistedProperty: PropertyDecorator = (t, p) => {
+  const obj = notPersistedPropertyMap.get(t) 
+  if(obj){
+    obj.add(p)
+  }else{
+    const set = new Set<string | symbol>()
+    notPersistedPropertyMap.set(t, set)
+    set.add(p)
+  }
+}
 
 
 const PersistProxy =  <T extends { [key: string | symbol]: any}>(instance: T, className: string, parent?: object, uid?: string): T  => {
@@ -104,6 +115,7 @@ const PersistProxy =  <T extends { [key: string | symbol]: any}>(instance: T, cl
   if(parent)addParent(parent) 
   return new Proxy(instance, {
     defineProperty(t, p, a){
+      if(notPersistedPropertyMap.get(t)?.has(p)) return Reflect.defineProperty(t, p, a)
       if(!propertySet.has(p)){
         propertySet.add(p)
         parentSet.size && refreshPropsList(id, propertySet)
@@ -121,6 +133,7 @@ const PersistProxy =  <T extends { [key: string | symbol]: any}>(instance: T, cl
       return res || Reflect.defineProperty(t, p, a)
     },
     deleteProperty(t, p){
+      if(notPersistedPropertyMap.get(t)?.has(p)) return Reflect.deleteProperty(t, p)
       propertySet.delete(p)
       if(parentSet.size>0){
         removeProp(t,p)
@@ -163,6 +176,7 @@ const deletePropsList = (id: string)=>{
 }
 
 const removeProp = (t: any, p: string | symbol) => {
+  if(notPersistedPropertyMap.get(t)?.has(p)) return 
   if(typeof p!=='string') return
   const descriptor = Reflect.getOwnPropertyDescriptor(t, p)
   if(!descriptor || !Reflect.has(descriptor, 'value')) return
@@ -173,6 +187,7 @@ const removeProp = (t: any, p: string | symbol) => {
   oldValueDeleteParent && oldValueDeleteParent(t)
 }
 const defineProp = (t:any,p: string | symbol) => {
+  if(notPersistedPropertyMap.get(t)?.has(p)) return 
   if(typeof p !== 'string')return
   const descriptor = Reflect.getOwnPropertyDescriptor(t, p)
   if(!descriptor || !Reflect.has(descriptor, 'value')) return

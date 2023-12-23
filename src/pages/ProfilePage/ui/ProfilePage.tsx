@@ -1,5 +1,5 @@
 import { store } from "@/entities/Store/model/Store"
-import { ReactObserver } from "@/shared/lib/model-persist/ReactObservable"
+import { ReactObserver } from "@/shared/lib/observavle/ReactObservable"
 import { Profile } from "@/widgets/Profile/Profile"
 import { SignUpIn } from "@/widgets/SignUpIn/SignUpIn"
 

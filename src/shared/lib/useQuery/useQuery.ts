@@ -28,13 +28,20 @@ type aa<K extends string> = K extends `is${infer _}` | 'toggleQuery' ? K : never
 type TState<T extends (...args: any[])=>Promise<any>>  = Omit<StatusExtend<Status, T>, aa<keyof StatusExtend<Status, T>>>
 
 
-export const useQuery = <T extends (...args: any[])=>Promise<any>>(query: T) => {
+export const useQuery = <T extends (...args: any[])=>any>(query: T) => {
   const [{status, error, result}, setState] = useState<TState<T>>({error: undefined, result: undefined, status: Status.default})
   //@ts-ignore
   const toggleQuery = useCallback<T>((...args) => {
       setState({status: Status.pending, error: undefined, result: undefined})
-      return query(...args)
-        .then(
+      let res
+      try{
+        res = query(...args)
+      }catch(e){
+        setState({status: Status.error, error: e instanceof Error ? e : undefined , result: undefined});
+      }
+      
+      if(res instanceof Promise){
+        res.then(
           res=>{
             setState({status: Status.success, error: undefined, result: res});
             return res
@@ -44,6 +51,10 @@ export const useQuery = <T extends (...args: any[])=>Promise<any>>(query: T) => 
             throw e
           }
         )
+      }else{
+        setState({status: Status.success, error: undefined, result: res});
+      }
+        
   }, [query, setState]) as T
   const res = {
     error,

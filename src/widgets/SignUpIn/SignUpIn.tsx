@@ -1,5 +1,5 @@
 import { UserService } from "@/entities/User/model/User"
-import { ReactObserver } from "@/shared/lib/model-persist/ReactObservable"
+import { ReactObserver } from "@/shared/lib/observavle/ReactObservable"
 import { FC, useState } from "react"
 import { Register } from "../Register/ui/Register"
 import { Login } from "../Login/ui/Login"

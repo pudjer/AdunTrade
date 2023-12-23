@@ -1,64 +1,64 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React from 'react';
 import { Tabs } from 'antd';
-import { useTranslation } from 'react-i18next';
 import { Tab as AntTab } from 'rc-tabs/lib/interface'
-import { useStore } from '@/app/providers/Store';
+import { ReactObserver } from '@/shared/lib/observavle/ReactObservable';
+import { Tab } from '@/entities/Tab/model/Tab';
 import { ItemTab } from '@/widgets/ItemTab/ui/ItemTab';
-import { ITab } from '@/entities/Tab/model/Tab';
-import { NewItemTab } from '@/widgets/NewItemTab/ui/NewItemTab';
+import { store } from '@/entities/Store/model/Store';
+import style from './ItemPage.module.scss'
+import { Search } from '@/widgets/Search/Search';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 
-export const ItemPage: React.FC = () => {
-  // const store = useStore()
-  // const [activeKey, setActiveKey] = useState<string>(store.tabs.selectedTab)
-  // const tabs: AntTab[] = store.tabs._tabs.map(tab=>( 
-  //   {
-  //     label: tab.label,
-  //     key: tab.key,
-  //     children: <ItemTab items={tab.items}/> 
-  //   }
-  // ))
-  // const createCB = useCallback((tab: ITab)=>{store.tabs.pushTab(tab); setActiveKey(tab.key)}, [store.tabs])
+export const ItemPage = ReactObserver(() => {
+  const tabService = store.tabService
+  console.log(tabService.tabs)
+  const tabsDisplay: AntTab[] = tabService.tabs.map(tab=>( 
+    {
+      label: tab.label,
+      key: tab.key,
+      children: <ItemTab items={tab.items}/> 
+    }
+  ))
 
-  // if(activeKey==='newtab'){
-  //   tabs.push({
-  //     key: 'newtab',
-  //     label: 'new tab',
-  //     children: <NewItemTab createCB={createCB}/>
-  //   })
-  // }
-  // const add = () => {
-  //   setActiveKey('newtab')
-  // }
+  if(tabService.selectedTab==='newtab'){
+    tabsDisplay.push({
+      key: 'newtab',
+      label: 'new tab',
+      children: <Search/>
+    })
+  }
+  const add = () => {
+    tabService.selectedTab = 'newtab'
+  }
 
-  // const remove = (targetKey: string) =>{ 
-  //   if(targetKey===activeKey) setActiveKey('newtab')
-  //   store.tabs.deleteTab(targetKey)
-  // }
-  // const onEdit = (
-  //   targetKey: TargetKey,
-  //   action: 'add' | 'remove',
-  // ) => {
-  //   if(action==='add'){
-  //     add()
-  //   }else{
-  //     if(typeof targetKey !== 'string') return
-  //     remove(targetKey)
-  //   }
-  // }
-  // const onChange = (targetKey: TargetKey) => {
-  //   if(typeof targetKey !== 'string') return
-  //   setActiveKey(targetKey)
-  // }
+  const remove = (targetKey: string) =>{ 
+    tabService.deleteTab(targetKey)
+  }
+  const onEdit = (
+    targetKey: TargetKey,
+    action: 'add' | 'remove',
+  ) => {
+    if(action==='add'){
+      add()
+    }else{
+      if(typeof targetKey !== 'string') return
+      remove(targetKey)
+    }
+  }
+  const onChange = (targetKey: TargetKey) => {
+    if(typeof targetKey !== 'string') return
+    tabService.selectedTab = targetKey
+  }
 
   return (
     <Tabs
+      className={style.tabs}
       type="editable-card"
-      // onChange={onChange}
-      // activeKey={activeKey}
-      // onEdit={onEdit}
-      // items={tabs}
+      onChange={onChange}
+      activeKey={tabService.selectedTab}
+      onEdit={onEdit}
+      items={tabsDisplay}
     />
   );
-}
+})

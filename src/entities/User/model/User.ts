@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_TOKEN_KEY } from "@/shared/const/localstorage"
 import { getMe, login, register, subscribe, unsubscribe } from "../api/UserApi"
-import { makeObservable } from "@/shared/lib/model-persist/obvservable"
-import { makePersistend } from "@/shared/lib/model-persist/PersistProxy"
+import { makeObservable } from "@/shared/lib/observavle/obvservable"
+import { makePersistend, notPersistedProperty } from "@/shared/lib/model-persist/PersistProxy"
 
 
 @makePersistend('user')
@@ -33,6 +33,7 @@ export class UserService{
   user?: User
   _token?: string
   error?: Error | string
+
   get token(){
     return this._token
   }
@@ -44,6 +45,8 @@ export class UserService{
       localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY)
     }
   }
+
+  
   async Login(username: string, password: string){
     const res = await login({username, password})
     const token = res.token
@@ -66,8 +69,7 @@ export class UserService{
   async Unsubscribe(){
     if(!this.token) throw Error('not auth')
     const user = await unsubscribe()
-    this.user = UserFactory(user.id, user.isAdmin, user.isSubscribed, user.username)
-    
+    this.user = UserFactory(user.id, user.isAdmin, user.isSubscribed, user.username)   
   }
   async Logout(){
     this.user = undefined

@@ -27,10 +27,8 @@ export const Sidebar = () => {
         <Menu style={{borderRadius: 6}}
         items={[
           { key: 1, label: t('Предметы'), icon: <ShopOutlined />, onClick: ()=>nav('items')},
-          { key: 2, label: t('Профиль'), icon: <UserOutlined />, onClick: ()=>nav('user')},
-          { key: 3, label: t('Домой'), icon: <HomeOutlined />, onClick: ()=>nav('')},
-
-        ]}
+          { key: 2, label: t('Профиль'), icon: <UserOutlined />, onClick: ()=>nav('user')}
+                ]}
       />
       <LangSelect />
       <ThemeChanger />

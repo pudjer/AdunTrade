@@ -1,8 +1,9 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Typography } from 'antd';
-import { ReactObserver } from '@/shared/lib/model-persist/ReactObservable';
+import { ReactObserver } from '@/shared/lib/observavle/ReactObservable';
 import { UserService } from '@/entities/User/model/User';
 import { useState } from 'react';
+import { useQuery } from '@/shared/lib/useQuery/useQuery';
 const {Text} = Typography
 interface FormValue{
   username: string
@@ -14,11 +15,12 @@ interface FormValue{
 }
 export const Login: React.FC<{userService: UserService}> = ReactObserver(({userService}) => {
   const [formError, setFormError] = useState<Error | undefined>(undefined)
+  const {toggleQuery, error} = useQuery(userService.Login.bind(userService))
 
   const onFinish = async(values: FormValue & {confirmPassword: string}) => {
     setFormError(undefined)
     try{
-      userService.Login(values.username, values.password)
+      toggleQuery && toggleQuery(values.username, values.password)
     }catch(e){
       if(e instanceof Error){
         setFormError(e)
@@ -48,6 +50,7 @@ export const Login: React.FC<{userService: UserService}> = ReactObserver(({userS
           placeholder="Password"
         />
       </Form.Item>
+      {error && <Text type='danger'>{error.message}</Text>}
       <Form.Item>
         <Button type="primary" htmlType="submit" >
           Log in

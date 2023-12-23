@@ -20,7 +20,6 @@ export const deleteTab = (tab: Tab | number | string, tabs: Tab[], selectedTab: 
   const ind = keySet.indexOf(tabs[tab as number].key)
   keySet.splice(ind, 1)
   tabs.splice(tab, 1)
-  tabs.pop()
   return selectedTab
 }
 
