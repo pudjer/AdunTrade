@@ -4,6 +4,7 @@ import { ReactObserver } from '@/shared/lib/observavle/ReactObservable';
 import { UserService } from '@/entities/User/model/User';
 import { useState } from 'react';
 import { useQuery } from '@/shared/lib/useQuery/useQuery';
+import { useTranslation } from 'react-i18next';
 const {Text} = Typography
 interface FormValue{
   username: string
@@ -16,7 +17,7 @@ interface FormValue{
 export const Login: React.FC<{userService: UserService}> = ReactObserver(({userService}) => {
   const [formError, setFormError] = useState<Error | undefined>(undefined)
   const {toggleQuery, error} = useQuery(userService.Login.bind(userService))
-
+  const {t} = useTranslation()
   const onFinish = async(values: FormValue & {confirmPassword: string}) => {
     setFormError(undefined)
     try{
@@ -37,23 +38,23 @@ export const Login: React.FC<{userService: UserService}> = ReactObserver(({userS
       {formError && <Text type='danger'>{formError.message}</Text>}
       <Form.Item
         name="username"
-        rules={[{ required: true, message: 'Please input your Username!' }]}
+        rules={[{ required: true, message: t('Пожалуйста введите ваш ник') }]}
       >
-        <Input prefix={<UserOutlined />} placeholder="Username" />
+        <Input prefix={<UserOutlined />} placeholder={t('Введите ник')}/>
       </Form.Item>
       <Form.Item
         name="password"
-        rules={[{ required: true, message: 'Please input your Password!' }]}
+        rules={[{ required: true, message: t('Пожалуйста введите ваш пароль') }]}
       >
         <Input.Password
           prefix={<LockOutlined />}
-          placeholder="Password"
+          placeholder={t('Введите пароль')}
         />
       </Form.Item>
       {error && <Text type='danger'>{error.message}</Text>}
       <Form.Item>
         <Button type="primary" htmlType="submit" >
-          Log in
+          {t('Войти')}
         </Button>
       </Form.Item>
     </Form>

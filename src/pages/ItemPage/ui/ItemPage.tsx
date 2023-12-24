@@ -7,10 +7,12 @@ import { ItemTab } from '@/widgets/ItemTab/ui/ItemTab';
 import { store } from '@/entities/Store/model/Store';
 import style from './ItemPage.module.scss'
 import { Search } from '@/widgets/Search/Search';
+import { useTranslation } from 'react-i18next';
 type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 
 export const ItemPage = ReactObserver(() => {
+  const {t} = useTranslation()
   const tabService = store.tabService
   const tabsDisplay: AntTab[] = tabService.tabs.map(tab=>( 
     {
@@ -23,7 +25,7 @@ export const ItemPage = ReactObserver(() => {
   if(tabService.selectedTab==='newtab'){
     tabsDisplay.push({
       key: 'newtab',
-      label: 'new tab',
+      label: t('Добавить предмет'),
       closable: false,
       children: <Search/>
     })

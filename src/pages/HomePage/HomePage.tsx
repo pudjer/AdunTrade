@@ -10,6 +10,7 @@ import Meta from "antd/es/card/Meta"
 import ky from "ky"
 import { makeObservable } from "mobx"
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 
 
@@ -17,6 +18,7 @@ const searchLocation = document.querySelector('#searchLocation')!.getAttribute('
 const search = (query: string) => ky.get(searchLocation, {searchParams:{q: query, size: 1}}).json<SearchResponse>()
 const Option: React.FC<{item: Item}> = ({item}) => {
   const [img, setImg]= useState<undefined | string>()
+  const {t} = useTranslation()
   useEffect( ()=>{
     search(item.Name).then(res=>setImg(res?.hits?.hits?.[0]?._source?.linktoimg))
   }, [])
@@ -37,16 +39,16 @@ const Option: React.FC<{item: Item}> = ({item}) => {
         ItemApi.getItem(item.Name, 'LisSkins').then((item)=>{item && tab.items.push(item)})
         store.tabService.selectedTab = tab.key
         
-      }}>Add to tabs</Button>
+      }}>{t('Добавить к вкладкам')}</Button>
     ]}
   >
     <Meta
       title={item.Name}
       description={
         <div >
-          <div><Typography.Text >{item.MarketName && 'MarketName: ' + item.MarketName}</Typography.Text></div>
-          <div><Typography.Text >{item.Price && 'Price: ' + item.Price+' rub'}</Typography.Text></div>
-          <div><Typography.Text >{item.BuyOrder && 'BuyOrder: ' + item.BuyOrder+' rub'}</Typography.Text></div>
+          <div><Typography.Text >{item.MarketName && t('Магазин')+': ' + item.MarketName}</Typography.Text></div>
+          <div><Typography.Text >{item.Price && t('Цена')+': ' + item.Price+' '+t('руб')}</Typography.Text></div>
+          <div><Typography.Text >{item.BuyOrder && t('Заявка на покупку')+': ' + item.BuyOrder+' '+t('руб')}</Typography.Text></div>
         </div>
       }
     />

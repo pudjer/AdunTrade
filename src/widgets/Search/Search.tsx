@@ -1,4 +1,4 @@
-import React, { ChangeEvent, ReactElement, useState } from 'react';
+import React, { ChangeEvent, ReactElement, useEffect, useState } from 'react';
 import { Button, Card, Input, Select, Typography } from 'antd';
 import { debounce } from 'lodash';
 import ky from 'ky';
@@ -10,6 +10,7 @@ import styles from './Search.module.scss'
 import { Tab, TabFactory } from '@/entities/Tab/model/Tab';
 import { useQuery } from '@/shared/lib/useQuery/useQuery';
 import { ItemApi } from '@/entities/Item/model/Item';
+import { useTranslation } from 'react-i18next';
 
 
 const searchLocation = document.querySelector('#searchLocation')!.getAttribute('value')!
@@ -44,8 +45,14 @@ const onChange = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
 
 
 
-const Option: React.FC<Coption> = ({linktoimg, name}) => (
-  <Card
+const Option: React.FC<Coption> = ({linktoimg, name}) => {
+  const {t} = useTranslation()
+  const [nalichie, set] = useState<string[]>([])
+  useEffect(()=>{
+    ItemApi.getItem(name, 'CsMarket').then((item)=>{item && set([...nalichie, 'CsMarket'])})
+    ItemApi.getItem(name, 'LisSkins').then((item)=>{item && set([...nalichie, 'LisSkins'])})
+  })
+  return <Card
     style={{ width: 300, margin: 30 }}
     cover={
       <img
@@ -63,14 +70,15 @@ const Option: React.FC<Coption> = ({linktoimg, name}) => (
         store.tabService.selectedTab = tab.key
 
         
-      }}>Add to tabs</Button>
+      }}>{t('Добавить к вкладкам')}</Button>
     ]}
   >
     <Meta
       title={name}
+      description={nalichie.map((s) => <Typography.Text key={s}>{s}</Typography.Text>)}
     />
   </Card>
-);
+}
 
 const getAddItems = async (n: number) => {
   try{
@@ -89,12 +97,13 @@ const getAddItems = async (n: number) => {
 
 
 export const Search: React.FC = ReactObserver(() => {
+  const {t} = useTranslation()
   const [from, setFrom] = useState<number>(0)
   const {toggleQuery, error} = useQuery(getAddItems)
   const {toggleQuery: rilOnChange, error: error2} = useQuery(async (e: ChangeEvent<HTMLInputElement>)=>{searchState.value = e.target.value;return await onChange(e)})
   return <div className={styles.search}>
     <Input
-      placeholder='Search Items'
+      placeholder={t('Найти предмет')}
       onChange={async (e)=>{rilOnChange && await rilOnChange(e); setFrom(0)}}
       value={searchState.value}
       style={{maxWidth:300}}
