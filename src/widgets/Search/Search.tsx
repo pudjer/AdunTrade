@@ -50,8 +50,8 @@ const Option: React.FC<Coption> = ({linktoimg, name}) => {
   const {t} = useTranslation()
   const [nalichie, set] = useState<string[]>([])
   useEffect(()=>{
-    ItemApi.getItem(name, 'CsMarket').then((item)=>{item && set([...nalichie, 'CsMarket'])})
-    ItemApi.getItem(name, 'LisSkins').then((item)=>{item && set([...nalichie, 'LisSkins'])})
+    ItemApi.getItem(name, 'CsMarket').then((item)=>{item && set(nalichie=>[...nalichie, 'CsMarket'])})
+    ItemApi.getItem(name, 'LisSkins').then((item)=>{item && set(nalichie=>[...nalichie, 'LisSkins'])})
   }, [])
   return <Card
     style={{ width: 300, margin: 30 }}
@@ -76,7 +76,10 @@ const Option: React.FC<Coption> = ({linktoimg, name}) => {
   >
     <Meta
       title={name}
-      description={nalichie.map((s) => <Typography.Text key={s}>{s}</Typography.Text>)}
+      description={<div style={{display: 'flex', flexDirection: 'column'}}>
+          <Typography.Text>{t('Наличие')+':'}</Typography.Text>
+          {nalichie.length ? nalichie.map((s) => <Typography.Text key={s}>{s}</Typography.Text>) : t('нет в наличии')}
+        </div>}
     />
   </Card>
 }

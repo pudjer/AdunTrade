@@ -9,7 +9,7 @@ import { SearchState } from "../Classes"
 @makeObservable
 export class Store{
   userService = new UserService()
-  tabService: TabService = new TabService()
+  tabService = new TabService()
   searchState = new SearchState()
 }
 
@@ -19,5 +19,6 @@ try{
   store = rehidrateRoot<Store>('store')
 }catch(e){
   console.log(e)
+  localStorage.clear()
   store = new Store()
 } 
