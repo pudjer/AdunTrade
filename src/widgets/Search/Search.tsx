@@ -9,6 +9,7 @@ import Meta from 'antd/es/card/Meta';
 import styles from './Search.module.scss'
 import { Tab, TabFactory } from '@/entities/Tab/model/Tab';
 import { useQuery } from '@/shared/lib/useQuery/useQuery';
+import { ItemApi } from '@/entities/Item/model/Item';
 
 
 const searchLocation = document.querySelector('#searchLocation')!.getAttribute('value')!
@@ -25,6 +26,7 @@ const searchState = store.searchState
 
 const onChange = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
   try{
+    delete searchState.error
     const val = e.target.value
     searchState.value = val
     const res = await search(val)
@@ -38,7 +40,7 @@ const onChange = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
     }
   }
  
-}, 2000)
+}, 1000)
 
 
 
@@ -53,8 +55,13 @@ const Option: React.FC<Coption> = ({linktoimg, name}) => (
     actions={[
       <Button onClick={()=>{
         const tab = TabFactory(name, name)
-        
+
         store.tabService.pushTab(tab)
+
+        ItemApi.getItem(name, 'CsMarket').then((item)=>{item && tab.items.push(item)})
+        ItemApi.getItem(name, 'LisSkins').then((item)=>{item && tab.items.push(item)})
+        store.tabService.selectedTab = tab.key
+
         
       }}>Add to tabs</Button>
     ]}
@@ -66,39 +73,41 @@ const Option: React.FC<Coption> = ({linktoimg, name}) => (
 );
 
 const getAddItems = async (n: number) => {
-    try{
-      const res = await search(searchState.value, n)
-      const opts = res?.hits.hits
-      
-      searchState.options.push(...opts.map(e=>optionFactory(e._source.name, e._source.linktoimg)))
-      console.log(searchState.options.length)
-    }catch(e){
-      if(e instanceof Error){
-        searchState.error = e.message
-      }
+  try{
+    delete searchState.error
+    const res = await search(searchState.value, n)
+    const opts = res?.hits.hits
+    
+    searchState.options.push(...opts.map(e=>optionFactory(e._source.name, e._source.linktoimg)))
+  }catch(e){
+    if(e instanceof Error){
+      searchState.error = e.message
     }
   }
+}
 
 
 
 export const Search: React.FC = ReactObserver(() => {
   const [from, setFrom] = useState<number>(0)
   const {toggleQuery, error} = useQuery(getAddItems)
-  const {toggleQuery: rilOnChange, error: error2} = useQuery((e: ChangeEvent<HTMLInputElement>)=>{searchState.value = e.target.value;return onChange(e)})
+  const {toggleQuery: rilOnChange, error: error2} = useQuery(async (e: ChangeEvent<HTMLInputElement>)=>{searchState.value = e.target.value;return await onChange(e)})
   return <div className={styles.search}>
     <Input
       placeholder='Search Items'
-      onChange={(e)=>{rilOnChange && rilOnChange(e); setFrom(0)}}
+      onChange={async (e)=>{rilOnChange && await rilOnChange(e); setFrom(0)}}
       value={searchState.value}
       style={{maxWidth:300}}
     />
     {error && <Typography.Text type='danger'>{error.message}</Typography.Text>}
     {error2 && <Typography.Text type='danger'>{error2.message}</Typography.Text>}
+    {searchState.error && <Typography.Text type='danger'>{searchState.error}</Typography.Text>}
+
 
     <div className={styles.rescontainer}>
       {searchState.options.map(e=><Option key={e.name} linktoimg={e.linktoimg} name={e.name}/>)}
     </div>
-    {searchState.options.length && <Button onClick={(e)=>{toggleQuery && toggleQuery(from+1); setFrom(from+1)}}>\/\/\/\/\/\/</Button>}
+    {searchState.options.length!==0 && <Button onClick={async (e)=>{toggleQuery && await toggleQuery(from+1); setFrom(from+1)}}>\/\/\/\/\/\/</Button>}
   </div>
 })
 

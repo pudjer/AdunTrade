@@ -12,7 +12,6 @@ type TargetKey = React.MouseEvent | React.KeyboardEvent | string;
 
 export const ItemPage = ReactObserver(() => {
   const tabService = store.tabService
-  console.log(tabService.tabs)
   const tabsDisplay: AntTab[] = tabService.tabs.map(tab=>( 
     {
       label: tab.label,
@@ -25,6 +24,7 @@ export const ItemPage = ReactObserver(() => {
     tabsDisplay.push({
       key: 'newtab',
       label: 'new tab',
+      closable: false,
       children: <Search/>
     })
   }
