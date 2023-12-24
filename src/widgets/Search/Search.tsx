@@ -27,6 +27,7 @@ const searchState = store.searchState
 
 const onChange = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
   try{
+    searchState.options = new MyArray()
     delete searchState.error
     const val = e.target.value
     searchState.value = val
@@ -51,7 +52,7 @@ const Option: React.FC<Coption> = ({linktoimg, name}) => {
   useEffect(()=>{
     ItemApi.getItem(name, 'CsMarket').then((item)=>{item && set([...nalichie, 'CsMarket'])})
     ItemApi.getItem(name, 'LisSkins').then((item)=>{item && set([...nalichie, 'LisSkins'])})
-  })
+  }, [])
   return <Card
     style={{ width: 300, margin: 30 }}
     cover={
@@ -114,7 +115,7 @@ export const Search: React.FC = ReactObserver(() => {
 
 
     <div className={styles.rescontainer}>
-      {searchState.options.map(e=><Option key={e.name} linktoimg={e.linktoimg} name={e.name}/>)}
+      {searchState.options.map((e,i)=><Option key={i} linktoimg={e.linktoimg} name={e.name}/>)}
     </div>
     {searchState.options.length!==0 && <Button onClick={async (e)=>{toggleQuery && await toggleQuery(from+1); setFrom(from+1)}}>\/\/\/\/\/\/</Button>}
   </div>

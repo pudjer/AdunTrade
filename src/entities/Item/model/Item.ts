@@ -30,7 +30,6 @@ export const ItemApi = {
     const item = ItemFactory(res.Name, res.MarketName)
     if(res.BuyOrder)item.BuyOrder = res.BuyOrder
     if(res.Price)item.Price = res.Price
-    console.log(item)
     return item
   },
   async getItems(marketname: string, pageNumber: number, pageSize: number){
